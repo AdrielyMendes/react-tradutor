@@ -1,3 +1,4 @@
+import { useState } from "react";
 
 
 function App() {
@@ -10,8 +11,14 @@ function App() {
     { code: "pt-br", name: "Português" },
   ];
 
-  let isLoading = false
+
   let error = ""
+  const [languageOrigem, setLanguageOrigem] = useState(languages[0].code);
+  const [languageDestino, setLanguageDestino] = useState(languages[5].code);
+
+  const [textoOrigem,setTextoOrigem] = useState("");
+  const [traducao,setTraducao] = useState("");
+  const [isLoading,setIsLoading]= useState(false);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -26,10 +33,16 @@ function App() {
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <select
               className="text-sm text-textColor bg-transparent border-none focus:outline-none cursor-pointer"
-              value="en-us"
+              value={languageOrigem}
+              onChange={(e) => setLanguageOrigem(e.target.value)}
+
             >
               <option value="pt-br">Português</option>
               <option value="en-us">Inglês</option>
+              <option value="it">Italiano</option>
+              <option value="de">Alemão</option>
+              <option value="fr">Francês</option>
+              <option value="es">Espanhol</option>
             </select>
 
             <button className="p-2 rounded-full hover:bg-gray-100 outline-none">
@@ -39,6 +52,7 @@ function App() {
                 stroke="currentColor"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
+              
               >
                 <path
                   strokeLinecap="round"
@@ -51,10 +65,15 @@ function App() {
 
             <select
               className="text-sm text-textColor bg-transparent border-none focus:outline-none cursor-pointer"
-              value="pt-br"
+              value={languageDestino}
+              onChange={(e) => setLanguageDestino(e.target.value)}
             >
               <option value="pt-br">Português</option>
               <option value="en-us">Inglês</option>
+              <option value="it">Italiano</option>
+              <option value="de">Alemão</option>
+              <option value="fr">Francês</option>
+              <option value="es">Espanhol</option>
             </select>
           </div>
 
@@ -69,7 +88,7 @@ function App() {
             <div className="relative p-4 bg-secondaryBackground border-l border-gray-200">
               {isLoading ? (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-blue-500 border-t-2"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-blue-500 border-t-2" textoTraduzido={traducao}></div>
                 </div>
               ) : (
                 <p className="text-lg text-textColor">Colocar aqui o texto traduzido</p>
