@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 function App() {
@@ -12,13 +12,50 @@ function App() {
   ];
 
 
-  let error = ""
   const [languageOrigem, setLanguageOrigem] = useState(languages[0].code);
   const [languageDestino, setLanguageDestino] = useState(languages[5].code);
 
   const [textoOrigem,setTextoOrigem] = useState("");
   const [traducao,setTraducao] = useState("");
   const [isLoading,setIsLoading]= useState(false);
+  const [error, setError] = useState("");
+
+  const traduzirTexto =async () =>{
+    if (textoOrigem ==="")return
+
+    setIsLoading(true)
+    try{
+      const response = await fetch(
+         `https://api.mymemory.translated.net/get?q=${encodeURIComponent(textoOrigem)}&langpair=${languageOrigem}|${languageDestino}` 
+
+      );
+      const data = await response.json();
+      setTraducao(data.responseData.translatedText);
+    }catch (error){
+      setError("Erro na tradução: " + error.message);
+    }
+    setIsLoading(false)
+  };
+
+  useEffect (() => {
+    traduzirTexto();
+  }, [textoOrigem,languageOrigem,languageDestino]);
+
+  const alteraIdiomas =  () => {
+    const origem = languageOrigem;// Armazena o idioma de origem atual
+    const destino = languageDestino;// Armazena o idioma de destino atual
+
+      // altera os idiomas
+    setLanguageOrigem(destino);
+    setLanguageDestino(origem);
+
+      // Atribui a tradução ao texto de origem
+    setTextoOrigem(traducao);
+
+      // Inicia a tradução novamente com o novo idioma de origem e destino
+    setTraducao("");//Limpa a tradução atual
+    traduzirTexto();// Chama a função de tradução
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -45,7 +82,7 @@ function App() {
               <option value="es">Espanhol</option>
             </select>
 
-            <button className="p-2 rounded-full hover:bg-gray-100 outline-none">
+            <button className="p-2 rounded-full hover:bg-gray-100 outline-none" onClick={alteraIdiomas}>
               <svg
                 className="w-5 h-5 text-headerColor"
                 fill="none"
@@ -81,17 +118,19 @@ function App() {
             <div className="p-4">
               <textarea
                 className="w-full h-40 text-lg text-textColor bg-transparent resize-none border-none outline-none"
-                placeholder="Digite seu texto..."                
+                placeholder="Digite seu texto..."         
+                value={textoOrigem}
+                onChange={(evento) => setTextoOrigem(evento.target.value)}       
               ></textarea>
             </div>
 
             <div className="relative p-4 bg-secondaryBackground border-l border-gray-200">
               {isLoading ? (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-blue-500 border-t-2" textoTraduzido={traducao}></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-blue-500 border-t-2"></div>
                 </div>
               ) : (
-                <p className="text-lg text-textColor">Colocar aqui o texto traduzido</p>
+                <p className="text-lg text-textColor">{traducao}</p>
               )}
             </div>
           </div>
